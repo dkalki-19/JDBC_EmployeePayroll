@@ -2,6 +2,7 @@ package com.example.employyepayrollJdbc;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.List;
 
 
 
@@ -204,6 +205,63 @@ public class EmployeePayrollDBService {
             System.out.println(rows > 0 ? "Employee deleted." : "No record found.");
         }
     }
+
+    public void addEmployeeFullTransaction(String name, String gender, double salary,
+        LocalDate startDate, List<String> deptNames) throws SQLException {
+		Connection connection = null;
+		try {
+			connection = getConnection();
+			connection.setAutoCommit(false);
+
+
+			String empQuery = "INSERT INTO employee_payroll (name, gender, salary, start_date) VALUES (?, ?, ?, ?)";
+			PreparedStatement empStmt = connection.prepareStatement(empQuery, Statement.RETURN_GENERATED_KEYS);
+			empStmt.setString(1, name);
+			empStmt.setString(2, gender);
+			empStmt.setDouble(3, salary);
+			empStmt.setDate(4, Date.valueOf(startDate));
+			empStmt.executeUpdate();
+			ResultSet rs = empStmt.getGeneratedKeys();
+			rs.next();
+			int empId = rs.getInt(1);
+
+
+			double deductions = salary * 0.2;
+			double taxable = salary - deductions;
+			double tax = taxable * 0.1;
+			double net = salary - tax;
+
+			String payQuery = "INSERT INTO payroll_details (employee_id, basic_pay, deductions, taxable_pay, tax, net_pay) VALUES (?, ?, ?, ?, ?, ?)";
+			PreparedStatement payStmt = connection.prepareStatement(payQuery);
+			payStmt.setInt(1, empId);
+			payStmt.setDouble(2, salary);
+			payStmt.setDouble(3, deductions);
+			payStmt.setDouble(4, taxable);
+			payStmt.setDouble(5, tax);
+			payStmt.setDouble(6, net);
+			payStmt.executeUpdate();
+
+
+			for (String dept : deptNames) {
+				PreparedStatement deptStmt = connection.prepareStatement(
+						"INSERT INTO employee_department (employee_id, dept_id) VALUES (?, (SELECT dept_id FROM department WHERE dept_name = ?))");
+				deptStmt.setInt(1, empId);
+				deptStmt.setString(2, dept);
+				deptStmt.executeUpdate();
+			}
+
+			connection.commit();
+			System.out.println("Employee added successfully across all tables.");
+
+		} catch (SQLException e) {
+			if (connection != null)
+				connection.rollback();
+			throw e;
+		} finally {
+			if (connection != null)
+				connection.setAutoCommit(true);
+		}
+	}
 
     
     
