@@ -20,6 +20,27 @@ public class EmployeePayrollDBService {
         return connection;
     }
 
+    public void readData() {
+        String query = "SELECT * FROM employee_payroll;";
+        try (Connection connection = getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                double salary = rs.getDouble("salary");
+                Date start = rs.getDate("start_date");
+                System.out.println(id + " | " + name + " | " + salary + " | " + start);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
+    
     public static void main(String[] args) {
         try {
             Connection connection = getConnection();
