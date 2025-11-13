@@ -2,12 +2,16 @@ package com.example.employyepayrollJdbc;
 
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class EmployeePayroll {
     public int id;
     public String name;
     public double salary;
     public LocalDate startDate;
+    
+    private List<String> departments;  
+
 
     public EmployeePayroll(int id, String name, double salary, LocalDate startDate) {
         this.id = id;
