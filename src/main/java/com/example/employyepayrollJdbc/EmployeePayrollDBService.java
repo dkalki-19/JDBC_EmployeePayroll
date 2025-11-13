@@ -97,6 +97,26 @@ public class EmployeePayrollDBService {
         }
     }
 
+    public void getSalaryStatisticsByGender() {
+        String query = "SELECT gender, SUM(salary), AVG(salary), MIN(salary), MAX(salary), COUNT(*) FROM employee_payroll GROUP BY gender;";
+        try (Connection connection = getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                System.out.println("Gender: " + rs.getString(1)
+                        + " | SUM: " + rs.getDouble(2)
+                        + " | AVG: " + rs.getDouble(3)
+                        + " | MIN: " + rs.getDouble(4)
+                        + " | MAX: " + rs.getDouble(5)
+                        + " | COUNT: " + rs.getInt(6));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     
     public static void main(String[] args) {
         try {
