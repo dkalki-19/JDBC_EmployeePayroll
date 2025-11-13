@@ -119,7 +119,7 @@ public class EmployeePayrollDBService {
 
     
     public EmployeePayroll addEmployee(String name, String gender, double salary, LocalDate startDate) throws SQLException {
-        String query = "INSERT INTO employee_payroll (name, gender, salary, start_date) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO employee_payroll (name, gender, salary, start,) VALUES (?, ?, ?, ?)";
         EmployeePayroll employee = null;
         try (Connection connection = getConnection();
              PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -143,6 +143,56 @@ public class EmployeePayrollDBService {
             }
         }
         return employee;
+    }
+
+    public void addEmployeeWithPayroll(String name, String gender, double salary, LocalDate startDate) throws SQLException {
+        Connection connection = null;
+        try {
+            connection = getConnection();
+            connection.setAutoCommit(false);
+
+            // Insert into employee_payroll
+            String empQuery = "INSERT INTO employee_payroll (name, gender, salary, start_date) VALUES (?, ?, ?, ?)";
+            PreparedStatement empStmt = connection.prepareStatement(empQuery, Statement.RETURN_GENERATED_KEYS);
+            empStmt.setString(1, name);
+            empStmt.setString(2, gender);
+            empStmt.setDouble(3, salary);
+            empStmt.setDate(4, Date.valueOf(startDate));
+            empStmt.executeUpdate();
+
+            ResultSet rs = empStmt.getGeneratedKeys();
+            int empId = 0;
+            if (rs.next()) empId = rs.getInt(1);
+
+            // Derived payroll details
+            double deductions = salary * 0.2;
+            double taxablePay = salary - deductions;
+            double tax = taxablePay * 0.1;
+            double netPay = salary - tax;
+
+            String payQuery = "INSERT INTO payroll_details (employee_id, basic_pay, deductions, taxable_pay, tax, net_pay) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement payStmt = connection.prepareStatement(payQuery);
+            payStmt.setInt(1, empId);
+            payStmt.setDouble(2, salary);
+            payStmt.setDouble(3, deductions);
+            payStmt.setDouble(4, taxablePay);
+            payStmt.setDouble(5, tax);
+            payStmt.setDouble(6, netPay);
+            payStmt.executeUpdate();
+
+            connection.commit();
+            System.out.println("Employee + Payroll details added successfully!");
+
+        } catch (SQLException e) {
+            if (connection != null) {
+                System.out.println("Transaction rolled back!");
+                connection.rollback();
+            }
+            throw e;
+        } finally {
+            if (connection != null)
+                connection.setAutoCommit(true);
+        }
     }
 
     
