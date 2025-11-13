@@ -30,7 +30,7 @@ public class EmployeePayrollDBService {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 double salary = rs.getDouble("salary");
-                Date start = rs.getDate("start_date");
+                Date start = rs.getDate("start");
                 System.out.println(id + " | " + name + " | " + salary + " | " + start);
             }
 
