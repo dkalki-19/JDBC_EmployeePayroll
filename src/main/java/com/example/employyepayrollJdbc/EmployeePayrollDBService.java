@@ -13,7 +13,7 @@ public class EmployeePayrollDBService {
     
     private static EmployeePayrollDBService instance;
 
-    private EmployeePayrollDBService() {}
+    EmployeePayrollDBService() {}
 
     public static EmployeePayrollDBService getInstance() {
         if (instance == null)
