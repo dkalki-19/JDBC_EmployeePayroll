@@ -83,7 +83,7 @@ public class EmployeePayrollDBService {
     }
 
     public void getEmployeesByDateRange(LocalDate start, LocalDate end) {
-        String query = "SELECT * FROM employee_payroll WHERE start_date BETWEEN ? AND ?";
+        String query = "SELECT * FROM employee_payroll WHERE start BETWEEN ? AND ?";
         try (Connection connection = getConnection();
              PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setDate(1, Date.valueOf(start));
@@ -195,6 +195,17 @@ public class EmployeePayrollDBService {
         }
     }
 
+    public void deleteEmployee(int id) throws SQLException {
+        String query = "DELETE FROM employee_payroll WHERE id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, id);
+            int rows = pstmt.executeUpdate();
+            System.out.println(rows > 0 ? "Employee deleted." : "No record found.");
+        }
+    }
+
+    
     
     public static void main(String[] args) {
         try {
