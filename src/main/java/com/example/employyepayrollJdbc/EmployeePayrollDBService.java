@@ -264,6 +264,18 @@ public class EmployeePayrollDBService {
 	}
 
     
+    public void removeEmployee(String name) {
+        String query = "UPDATE employee_payroll SET is_active = FALSE WHERE name = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, name);
+            int rows = pstmt.executeUpdate();
+            System.out.println(rows > 0 ? "Employee set inactive: " + name : "Employee not found");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
     
     public static void main(String[] args) {
         try {
