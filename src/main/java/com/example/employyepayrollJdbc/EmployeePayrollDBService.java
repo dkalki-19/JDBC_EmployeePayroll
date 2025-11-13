@@ -1,6 +1,7 @@
 package com.example.employyepayrollJdbc;
 
 import java.sql.*;
+import java.time.LocalDate;
 
 
 
@@ -13,7 +14,7 @@ public class EmployeePayrollDBService {
     
     private static EmployeePayrollDBService instance;
 
-    private EmployeePayrollDBService() {}
+    EmployeePayrollDBService() {}
 
     public static EmployeePayrollDBService getInstance() {
         if (instance == null)
@@ -76,6 +77,21 @@ public class EmployeePayrollDBService {
             int rows = pstmt.executeUpdate();
             if (rows > 0)
                 System.out.println("Salary updated using PreparedStatement for " + name);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getEmployeesByDateRange(LocalDate start, LocalDate end) {
+        String query = "SELECT * FROM employee_payroll WHERE start_date BETWEEN ? AND ?";
+        try (Connection connection = getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setDate(1, Date.valueOf(start));
+            pstmt.setDate(2, Date.valueOf(end));
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                System.out.println(rs.getString("name") + " joined on " + rs.getDate("start_date"));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
