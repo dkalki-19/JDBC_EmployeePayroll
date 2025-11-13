@@ -2,10 +2,24 @@ package com.example.employyepayrollJdbc;
 
 import java.sql.*;
 
+
+
+
+
 public class EmployeePayrollDBService {
     private static final String URL = "jdbc:mysql://localhost:3306/payroll_service";
     private static final String USER = "root";
     private static final String PASSWORD = "";
+    
+    private static EmployeePayrollDBService instance;
+
+    private EmployeePayrollDBService() {}
+
+    public static EmployeePayrollDBService getInstance() {
+        if (instance == null)
+            instance = new EmployeePayrollDBService();
+        return instance;
+    }
 
     public static Connection getConnection() throws SQLException {
         Connection connection = null;
