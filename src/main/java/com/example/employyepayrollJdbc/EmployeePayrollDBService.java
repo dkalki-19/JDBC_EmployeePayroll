@@ -118,6 +118,34 @@ public class EmployeePayrollDBService {
     }
 
     
+    public EmployeePayroll addEmployee(String name, String gender, double salary, LocalDate startDate) throws SQLException {
+        String query = "INSERT INTO employee_payroll (name, gender, salary, start_date) VALUES (?, ?, ?, ?)";
+        EmployeePayroll employee = null;
+        try (Connection connection = getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            pstmt.setString(1, name);
+            pstmt.setString(2, gender);
+            pstmt.setDouble(3, salary);
+            pstmt.setDate(4, Date.valueOf(startDate));
+
+            int rowsAffected = pstmt.executeUpdate();
+
+            if (rowsAffected == 1) {
+                ResultSet rs = pstmt.getGeneratedKeys();
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    employee = new EmployeePayroll(id, name, salary, startDate);
+                    System.out.println("Employee added successfully: " + employee);
+                }
+            } else {
+                throw new SQLException("Insertion failed!");
+            }
+        }
+        return employee;
+    }
+
+    
     public static void main(String[] args) {
         try {
             Connection connection = getConnection();
