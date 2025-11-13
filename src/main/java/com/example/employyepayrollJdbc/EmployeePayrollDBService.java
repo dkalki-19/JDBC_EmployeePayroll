@@ -40,6 +40,20 @@ public class EmployeePayrollDBService {
     }
 
     
+    public void updateSalary(String name, double newSalary) {
+        String query = String.format("UPDATE employee_payroll SET salary = %.2f WHERE name = '%s';", newSalary, name);
+        try (Connection connection = getConnection();
+             Statement stmt = connection.createStatement()) {
+            int rows = stmt.executeUpdate(query);
+            if (rows > 0) {
+                System.out.println("Salary updated successfully for " + name);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
     
     public static void main(String[] args) {
         try {
