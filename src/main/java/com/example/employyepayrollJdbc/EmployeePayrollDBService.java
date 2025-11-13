@@ -53,7 +53,20 @@ public class EmployeePayrollDBService {
         }
     }
 
-    
+    public void updateSalaryUsingPreparedStatement(String name, double newSalary) {
+        String query = "UPDATE employee_payroll SET salary = ? WHERE name = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setDouble(1, newSalary);
+            pstmt.setString(2, name);
+            int rows = pstmt.executeUpdate();
+            if (rows > 0)
+                System.out.println("Salary updated using PreparedStatement for " + name);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     
     public static void main(String[] args) {
         try {
